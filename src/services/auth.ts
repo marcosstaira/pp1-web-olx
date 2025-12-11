@@ -1,10 +1,10 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
 export type RegisterVendorPayload = {
   nome: string
   email: string
   senha: string
-  cpfCnpj: string  
+  cpfCnpj: string
   telefone: string
   dataNascimento?: string
   cep: string
@@ -32,7 +32,7 @@ async function request<T>(url: string, options: RequestInit): Promise<T> {
     const defaultHeaders: HeadersInit = {
       'Content-Type': 'application/json',
     };
-    
+
     const response = await fetch(`${API_BASE_URL}${url}`, {
       headers: {
         ...defaultHeaders,
@@ -43,10 +43,10 @@ async function request<T>(url: string, options: RequestInit): Promise<T> {
 
     if (!response.ok) {
       let errorMessage = 'Ocorreu um erro inesperado. Tente novamente.';
-      
+
       try {
         const errorData = await response.json();
-        
+
         if (errorData.message) {
           errorMessage = errorData.message;
         } else if (errorData.error) {
@@ -71,7 +71,7 @@ async function request<T>(url: string, options: RequestInit): Promise<T> {
             errorMessage = `Erro ${response.status}: ${response.statusText}`;
         }
       }
-      
+
       const error = new Error(errorMessage) as Error & { status?: number };
       error.status = response.status;
       throw error;
@@ -153,9 +153,9 @@ export async function getCurrentUser(): Promise<UserData> {
     method: 'GET',
     headers: getAuthHeaders(),
   });
-  
+
   const endereco = data.endereco || {};
-  
+
   return {
     id: data.id,
     nome: data.nome,
@@ -188,19 +188,19 @@ export async function updateCurrentUser(data: UpdateUserPayload): Promise<UserDa
     uf: data.uf,
     complemento: data.complemento,
   };
-  
+
   Object.keys(payload).forEach(key => {
     if (payload[key] === undefined || payload[key] === null || payload[key] === '') {
       delete payload[key];
     }
   });
-  
+
   await request<any>('/api/usuarios/me', {
     method: 'PUT',
     headers: getAuthHeaders(),
     body: JSON.stringify(payload),
   });
-  
+
   return getCurrentUser();
 }
 
@@ -218,7 +218,7 @@ export async function solicitarRedefinicaoSenha(email: string): Promise<void> {
     try {
       const contentType = response.headers.get('content-type');
       const text = await response.text();
-      
+
       if (contentType && contentType.includes('application/json') && text.trim()) {
         try {
           const errorData = JSON.parse(text);
@@ -252,7 +252,7 @@ export async function redefinirSenha(token: string, novaSenha: string): Promise<
     try {
       const contentType = response.headers.get('content-type');
       const text = await response.text();
-      
+
       if (contentType && contentType.includes('application/json') && text.trim()) {
         try {
           const errorData = JSON.parse(text);
@@ -283,11 +283,11 @@ export async function verifyEmail(codigo: string): Promise<{ message: string }> 
 
     if (response.ok) {
       const contentType = response.headers.get('content-type');
-      
+
       if (response.status === 204 || !contentType || !contentType.includes('application/json')) {
         return { message: 'Sua conta foi ativada com sucesso!' };
       }
-      
+
       try {
         const data = await response.json();
         return data.message ? data : { message: 'Sua conta foi ativada com sucesso!' };
@@ -297,7 +297,7 @@ export async function verifyEmail(codigo: string): Promise<{ message: string }> 
     }
 
     let errorMessage = 'Erro ao verificar email. O código pode estar inválido ou expirado.';
-    
+
     try {
       const errorData = await response.json();
       if (errorData.message) {
@@ -312,7 +312,7 @@ export async function verifyEmail(codigo: string): Promise<{ message: string }> 
         errorMessage = 'Código de verificação inválido.';
       }
     }
-    
+
     throw new Error(errorMessage);
   } catch (error) {
     if (error instanceof Error) {
