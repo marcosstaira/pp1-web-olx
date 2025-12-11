@@ -1,5 +1,4 @@
-const API_BASE_URL = '/api'
-
+const API_BASE_URL = ''
 export type RegisterVendorPayload = {
   nome: string
   email: string
