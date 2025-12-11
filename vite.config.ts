@@ -7,10 +7,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        // Adicionamos /api aqui também para garantir
-        target: 'http://167.71.123.166:8080/api',
+        target: 'http://167.71.123.166:8080',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        // Removemos a linha "rewrite" que cortava o /api
       },
     },
   },
